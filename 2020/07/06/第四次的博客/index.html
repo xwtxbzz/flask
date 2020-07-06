@@ -1,0 +1,230 @@
+
+<!DOCTYPE html>
+<html lang="en" class="loading">
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>第四次的博客 - 小王同学的博客</title>
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="google" content="notranslate" />
+    <meta name="keywords" content="Fechin,"> 
+    <meta name="description" content="OpenCV—python图像矫正一、基于傅里叶变换的图像矫正
+由于拍照时，图像被旋转，为方便观看或使用，需要对旋转图像进行校正。所以我们在此使用有关傅里叶变换的函数来得到旋转图像频域图像，再通过霍,"> 
+    <meta name="author" content="John Doe"> 
+    <link rel="alternative" href="atom.xml" title="小王同学的博客" type="application/atom+xml"> 
+    <link rel="icon" href="/img/favicon.png"> 
+    
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css">
+
+    
+<link rel="stylesheet" href="/css/diaspora.css">
+
+    <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+    <script>
+         (adsbygoogle = window.adsbygoogle || []).push({
+              google_ad_client: "ca-pub-8691406134231910",
+              enable_page_level_ads: true
+         });
+    </script>
+    <script async custom-element="amp-auto-ads"
+        src="https://cdn.ampproject.org/v0/amp-auto-ads-0.1.js">
+    </script>
+<meta name="generator" content="Hexo 4.2.0"></head>
+
+<body class="loading">
+    <span id="config-title" style="display:none">小王同学的博客</span>
+    <div id="loader"></div>
+    <div id="single">
+    <div id="top" style="display: block;">
+    <div class="bar" style="width: 0;"></div>
+    <a class="icon-home image-icon" href="javascript:;" data-url="http://yoursite.com"></a>
+    <div title="播放/暂停" class="icon-play"></div>
+    <h3 class="subtitle">第四次的博客</h3>
+    <div class="social">
+        <!--<div class="like-icon">-->
+            <!--<a href="javascript:;" class="likeThis active"><span class="icon-like"></span><span class="count">76</span></a>-->
+        <!--</div>-->
+        <div>
+            <div class="share">
+                <a title="获取二维码" class="icon-scan" href="javascript:;"></a>
+            </div>
+            <div id="qr"></div>
+        </div>
+    </div>
+    <div class="scrollbar"></div>
+</div>
+
+    <div class="section">
+        <div class="article">
+    <div class='main'>
+        <h1 class="title">第四次的博客</h1>
+        <div class="stuff">
+            <span>七月 06, 2020</span>
+            
+
+        </div>
+        <div class="content markdown">
+            <h2 id="OpenCV—python图像矫正"><a href="#OpenCV—python图像矫正" class="headerlink" title="OpenCV—python图像矫正"></a>OpenCV—python图像矫正</h2><h4 id="一、基于傅里叶变换的图像矫正"><a href="#一、基于傅里叶变换的图像矫正" class="headerlink" title="一、基于傅里叶变换的图像矫正"></a>一、基于傅里叶变换的图像矫正</h4><blockquote>
+<p>由于拍照时，图像被旋转，为方便观看或使用，需要对旋转图像进行校正。所以我们在此使用有关傅里叶变换的函数来得到旋转图像频域图像，再通过霍夫直线变换得到图像的旋转角度，最后使用OpenCV中的仿射变换来将图像旋转至正常的角度，从而对图像进行矫正。</p>
+</blockquote>
+<h6 id="1-1有关傅里叶变换的函数过程"><a href="#1-1有关傅里叶变换的函数过程" class="headerlink" title="1.1有关傅里叶变换的函数过程"></a>1.1有关傅里叶变换的函数过程</h6><ol>
+<li>getOptimalDFTSize():返回给定尺寸的傅里叶最优尺寸大小，提高运行速度（需要扩充图像，填充多少由此函数计算得到：被计算的数字序列长度vecsize为2的n次幂或者能够分解成2,3,5的乘积）<br>copyMakeBorder() 边界扩充函数。</li>
+</ol>
+<ol start="2">
+<li>为傅立叶变换的结果(实部和虚部)分配存储空间. 傅立叶变换的结果是复数，这就是说对于每个原图像值，结果是两个图像值。 此外，频域值范围远远超过空间值范围， 因此至少要将频域储存在 float 格式中。 结果我们将输入图像转换成浮点类型，并多加一个额外通道来储存复数部分。</li>
+</ol>
+<ol start="3">
+<li>进行离散傅立叶变换. 支持图像原地计算 (输入输出为同一图像):dtf() ：对一维或者二维浮点数数组进行正向或反向傅里叶变换 将复数转换为幅度复数包含实数部分(Re)和复数部分 (imaginary - Im)。</li>
+</ol>
+<ol start="4">
+<li>magnitude() 计算二维矢量的幅值。</li>
+</ol>
+<ol start="5">
+<li>对数尺度(logarithmic scale)缩放. 傅立叶变换的幅度值范围大到不适合在屏幕上显示。高值在屏幕上显示为白点，而低值为黑点，高低值的变化无法有效分辨。所以我们首先要对图像进行缩放。</li>
+</ol>
+<ol start="6">
+<li>剪切和重分布幅度图象限.将新添加的像素剔除。为了方便显示，我们也可以重新分布幅度图象限位置(注：将第五步得到的幅度图从中间划开得到四张1/4子图像，将每张子图像看成幅度图的一个象限，重新分布即将四个角点重叠到图片中心)。 这样的话原点(0,0)就位移到图像中心。</li>
+</ol>
+<ol start="7">
+<li>归一化. 将像素值归一到 float(0,1) 再乘以 255用于显示 。normalize() 矩阵归一化函数。</li>
+</ol>
+<h6 id="1-2-图像矫正处理流程"><a href="#1-2-图像矫正处理流程" class="headerlink" title="1.2 图像矫正处理流程"></a>1.2 图像矫正处理流程</h6><ol>
+<li>获取图像的傅里叶变换图</li>
+<li>二值化</li>
+<li>Hough直线检测</li>
+<li>计算倾斜角度</li>
+<li>旋转校正</li>
+</ol>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> cv2</span><br><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"><span class="keyword">import</span> math</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">fourier_demo</span><span class="params">()</span>:</span></span><br><span class="line">    <span class="comment"># 1、灰度化读取文件，</span></span><br><span class="line">    img = cv2.imread(<span class="string">"32.jpg"</span>,<span class="number">0</span>)</span><br><span class="line">    img = img_resize(img)</span><br><span class="line">    <span class="comment"># 2、图像延扩</span></span><br><span class="line">    h, w = img.shape[:<span class="number">2</span>]</span><br><span class="line">    new_h = cv2.getOptimalDFTSize(h)</span><br><span class="line">    new_w = cv2.getOptimalDFTSize(w)</span><br><span class="line">    right = new_w - w</span><br><span class="line">    bottom = new_h - h</span><br><span class="line">    nimg = cv2.copyMakeBorder(img, <span class="number">0</span>, bottom, <span class="number">0</span>, right, borderType=cv2.BORDER_CONSTANT, value=<span class="number">0</span>)</span><br><span class="line">    cv2.imshow(<span class="string">'new image'</span>, nimg)</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 3、执行傅里叶变换，并过得频域图像</span></span><br><span class="line">    f = np.fft.fft2(nimg)   <span class="comment">#使用fft函数对余弦波信号进行傅里叶变换。</span></span><br><span class="line">    fshift = np.fft.fftshift(f)  <span class="comment">#使用fftshift函数进行移频操作。</span></span><br><span class="line">    magnitude = np.log(np.abs(fshift)) <span class="comment">#用对数尺度来替换线性尺度</span></span><br><span class="line"></span><br><span class="line">    <span class="comment"># 二值化</span></span><br><span class="line">    magnitude_uint = magnitude.astype(np.uint8)</span><br><span class="line">    ret, thresh = cv2.threshold(magnitude_uint, <span class="number">11</span>, <span class="number">255</span>, cv2.THRESH_BINARY)</span><br><span class="line">    print(ret)</span><br><span class="line"></span><br><span class="line">    cv2.imshow(<span class="string">'thresh'</span>, thresh)</span><br><span class="line">    print(thresh.dtype)</span><br><span class="line">    </span><br><span class="line">    <span class="comment"># 霍夫直线变换</span></span><br><span class="line">    lines = cv2.HoughLinesP(thresh, <span class="number">1</span>, np.pi / <span class="number">180</span>, <span class="number">30</span>, minLineLength=<span class="number">40</span>, maxLineGap=<span class="number">100</span>)</span><br><span class="line">    print(len(lines))</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 创建一个新图像，标注直线</span></span><br><span class="line">    lineimg = np.ones(nimg.shape, dtype=np.uint8)</span><br><span class="line">    lineimg = lineimg * <span class="number">255</span></span><br><span class="line"></span><br><span class="line">    piThresh = np.pi / <span class="number">180</span></span><br><span class="line">    pi2 = np.pi / <span class="number">2</span></span><br><span class="line">    print(piThresh)</span><br><span class="line">    </span><br><span class="line">	<span class="comment">#通过直线的偏转计算角度</span></span><br><span class="line">    <span class="keyword">for</span> line <span class="keyword">in</span> lines:</span><br><span class="line">        x1, y1, x2, y2 = line[<span class="number">0</span>]</span><br><span class="line">        cv2.line(lineimg, (x1, y1), (x2, y2), (<span class="number">0</span>, <span class="number">255</span>, <span class="number">0</span>), <span class="number">2</span>)</span><br><span class="line">        <span class="keyword">if</span> x2 - x1 == <span class="number">0</span>:</span><br><span class="line">            <span class="keyword">continue</span></span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            theta = (y2 - y1) / (x2 - x1)</span><br><span class="line">        <span class="keyword">if</span> abs(theta) &lt; piThresh <span class="keyword">or</span> abs(theta - pi2) &lt; piThresh:</span><br><span class="line">            <span class="keyword">continue</span></span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            print(theta)</span><br><span class="line">	<span class="comment">#获取角度</span></span><br><span class="line">    angle = math.atan(theta)</span><br><span class="line">    print(angle)</span><br><span class="line">    angle = angle * (<span class="number">180</span> / np.pi)</span><br><span class="line">    print(angle)</span><br><span class="line">    angle = (angle - <span class="number">90</span>) / (w / h)</span><br><span class="line">    print(angle)</span><br><span class="line"></span><br><span class="line">    center = (w // <span class="number">2</span>, h // <span class="number">2</span>)</span><br><span class="line">    </span><br><span class="line">    <span class="comment">#利用仿射变换旋转图像</span></span><br><span class="line">    M = cv2.getRotationMatrix2D(center, angle, <span class="number">1.0</span>) <span class="comment">#获取旋转矩阵</span></span><br><span class="line">    img = cv2.imread(<span class="string">"32.jpg"</span>)</span><br><span class="line">    img = img_resize(img)</span><br><span class="line">    rotated = cv2.warpAffine(img, M, (w, h), flags=cv2.INTER_CUBIC, borderMode=cv2.BORDER_REPLICATE)</span><br><span class="line">    cv2.imshow(<span class="string">'line image'</span>, lineimg)</span><br><span class="line">    cv2.imshow(<span class="string">'rotated'</span>, rotated)</span><br><span class="line">    rotated = cv2.resize(rotated,(w,h))</span><br><span class="line">    cv2.imwrite(<span class="string">"321.jpg"</span>,rotated)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">img_resize</span><span class="params">(image)</span>:</span></span><br><span class="line">    height, width = image.shape[<span class="number">0</span>], image.shape[<span class="number">1</span>]</span><br><span class="line">    <span class="comment"># 设置新的图片分辨率框架</span></span><br><span class="line">    width_new = <span class="number">1280</span></span><br><span class="line">    height_new = <span class="number">720</span></span><br><span class="line">    <span class="comment"># 判断图片的长宽比率</span></span><br><span class="line">    <span class="keyword">if</span> width / height &gt;= width_new / height_new:</span><br><span class="line">        img_new = cv2.resize(image, (width_new, int(height * width_new / width)))</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        img_new = cv2.resize(image, (int(width * height_new / height), height_new))</span><br><span class="line">    <span class="keyword">return</span> img_new</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">fourier_demo()</span><br><span class="line">cv2.waitKey(<span class="number">0</span>)</span><br><span class="line">cv2.destroyAllWindows()</span><br></pre></td></tr></table></figure>
+
+<h6 id="1-3实现效果"><a href="#1-3实现效果" class="headerlink" title="1.3实现效果"></a>1.3实现效果</h6><p><img src="https://ypcdn.105577.xyz/0dcb435cacd9542972383719216ccab5.png" alt="请输入信息"></p>
+<p><img src="https://ypcdn.105577.xyz/add49d176fd0532fee850eb6e6363038.png" alt="请输入信息"></p>
+<h4 id="二、基于透视的图像矫正"><a href="#二、基于透视的图像矫正" class="headerlink" title="二、基于透视的图像矫正"></a>二、基于透视的图像矫正</h4><blockquote>
+<p>可能在拍摄图片的过程中，我们由于距离很远，难以把握好拍摄角度，所以相机中的图片就会就会效果较差的透视效果，所以我们需要调整图片，将三维的图片映射到二维平面上。首先我们先对图片进行灰度化，再用高斯模糊去除图片噪声，再利用Canny进行边缘检测获取边缘图像，最后通过轮廓信息将图像进行矫正。</p>
+</blockquote>
+<h5 id="2-1有关透视变换的函数内容"><a href="#2-1有关透视变换的函数内容" class="headerlink" title="2.1有关透视变换的函数内容"></a>2.1有关透视变换的函数内容</h5><p> 基本原理</p>
+<p> 透视变换（Perspective Transformation）的本质是将图像投影到一个新的视平面，其通用变换公式为：</p>
+<p><img src="https://images2015.cnblogs.com/blog/893836/201603/893836-20160310181216022-443667220.png" alt="img"></p>
+<p> （u，v）为原始图像像素坐标，（x=x’/w’，y=y’/w’）为变换之后的图像像素坐标。透视变换矩阵图解如下：</p>
+<p><img src="https://images2015.cnblogs.com/blog/893836/201603/893836-20160310181336132-1054601335.png" alt="img"></p>
+<h5 id="2-2-自动获取图像顶点变换"><a href="#2-2-自动获取图像顶点变换" class="headerlink" title="2.2  自动获取图像顶点变换"></a>2.2  自动获取图像顶点变换</h5><ol>
+<li>以灰度图读入</li>
+<li>腐蚀膨胀，闭合等操作</li>
+<li>二值化图像</li>
+<li>获取图像顶点</li>
+<li>透视矫正</li>
+</ol>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> imutils.perspective <span class="keyword">import</span> four_point_transform</span><br><span class="line"><span class="keyword">import</span> imutils</span><br><span class="line"><span class="keyword">import</span> cv2</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">Get_Outline</span><span class="params">(input_dir)</span>:</span></span><br><span class="line">    image = cv2.imread(input_dir)</span><br><span class="line">    image = img_resize(image)</span><br><span class="line">    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)   <span class="comment">#图像灰度化</span></span><br><span class="line">    blurred = cv2.GaussianBlur(gray, (<span class="number">5</span>, <span class="number">5</span>), <span class="number">0</span>)      <span class="comment">#高斯模糊去除噪声</span></span><br><span class="line">    edged = cv2.Canny(blurred, <span class="number">35</span>, <span class="number">150</span>)              <span class="comment">#边缘检测得到边缘图像</span></span><br><span class="line">    <span class="keyword">return</span> image, gray, edged</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">Get_cnt</span><span class="params">(edged)</span>:</span></span><br><span class="line">    cnts = cv2.findContours(edged.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE) <span class="comment">#轮廓检测获取轮廓</span></span><br><span class="line">    cnts = cnts[<span class="number">1</span>] <span class="keyword">if</span> imutils.is_cv3() <span class="keyword">else</span> cnts[<span class="number">0</span>]</span><br><span class="line">    docCnt = <span class="literal">None</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> len(cnts) &gt; <span class="number">0</span>:</span><br><span class="line">        cnts = sorted(cnts, key=cv2.contourArea, reverse=<span class="literal">True</span>)</span><br><span class="line">        <span class="keyword">for</span> c <span class="keyword">in</span> cnts:</span><br><span class="line">            peri = cv2.arcLength(c, <span class="literal">True</span>)  <span class="comment"># 轮廓按大小降序排序</span></span><br><span class="line">            approx = cv2.approxPolyDP(c, <span class="number">0.02</span> * peri, <span class="literal">True</span>)  <span class="comment"># 获取近似的轮廓</span></span><br><span class="line">            <span class="keyword">if</span> len(approx) == <span class="number">4</span>:  <span class="comment"># 近似轮廓有四个顶点</span></span><br><span class="line">                docCnt = approx</span><br><span class="line">                <span class="keyword">break</span></span><br><span class="line">    <span class="keyword">return</span> docCnt</span><br><span class="line"></span><br><span class="line">    <span class="comment">#用于调整图片大小</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">img_resize</span><span class="params">(image)</span>:</span></span><br><span class="line">    height, width = image.shape[<span class="number">0</span>], image.shape[<span class="number">1</span>]</span><br><span class="line">    <span class="comment"># 设置新的图片分辨率框架</span></span><br><span class="line">    width_new = <span class="number">1280</span></span><br><span class="line">    height_new = <span class="number">720</span></span><br><span class="line">    <span class="comment"># 判断图片的长宽比率</span></span><br><span class="line">    <span class="keyword">if</span> width / height &gt;= width_new / height_new:</span><br><span class="line">        img_new = cv2.resize(image, (width_new, int(height * width_new / width)))</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        img_new = cv2.resize(image, (int(width * height_new / height), height_new))</span><br><span class="line">    <span class="keyword">return</span> img_new</span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">"__main__"</span>:</span><br><span class="line">    input_dir = <span class="string">"26.jpg"</span></span><br><span class="line">    image, gray, edged = Get_Outline(input_dir)</span><br><span class="line">    docCnt = Get_cnt(edged)</span><br><span class="line">    result_img = four_point_transform(image, docCnt.reshape(<span class="number">4</span>, <span class="number">2</span>))  <span class="comment"># 对原始图像进行四点透视变换</span></span><br><span class="line">    cv2.imshow(<span class="string">"original"</span>, image)</span><br><span class="line">    cv2.imshow(<span class="string">"gray"</span>, gray)</span><br><span class="line">    cv2.imshow(<span class="string">"edged"</span>, edged)</span><br><span class="line">    cv2.imshow(<span class="string">"result_img"</span>, result_img)</span><br><span class="line">    cv2.imwrite(<span class="string">"261.jpg"</span>,result_img)</span><br><span class="line">    cv2.waitKey(<span class="number">0</span>)</span><br></pre></td></tr></table></figure>
+
+<h5 id="2-3实现效果"><a href="#2-3实现效果" class="headerlink" title="2.3实现效果"></a>2.3实现效果</h5><p><img src="https://ypcdn.105577.xyz/e273a1aaf1a239c18563e51ab54b20c1.png" alt="请输入信息"></p>
+<p><img src="https://ypcdn.105577.xyz/7cff0b8ead02ac8be9bae290ad7920ae.png" alt="请输入信息"></p>
+
+            <!--[if lt IE 9]><script>document.createElement('audio');</script><![endif]-->
+            <audio id="audio" loop="1" preload="auto" controls="controls" data-autoplay="false">
+                <source type="audio/mpeg" src="">
+            </audio>
+            
+                <ul id="audio-list" style="display:none">
+                    
+                        
+                            <li title='0' data-url='http://link.hhtjim.com/163/5146554.mp3'></li>
+                        
+                    
+                        
+                            <li title='1' data-url='http://link.hhtjim.com/qq/001faIUs4M2zna.mp3'></li>
+                        
+                    
+                </ul>
+            
+        </div>
+        
+    <div id='gitalk-container' class="comment link"
+        data-ae='true'
+        data-ci=''
+        data-cs=''
+        data-r=''
+        data-o=''
+        data-a=''
+        data-d='false'
+    >查看评论</div>
+
+
+    </div>
+    
+</div>
+
+
+    </div>
+</div>
+</body>
+
+<script src="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js"></script>
+
+
+<script src="//lib.baomitu.com/jquery/1.8.3/jquery.min.js"></script>
+<script src="/js/plugin.js"></script>
+<script src="/js/diaspora.js"></script>
+
+
+<link rel="stylesheet" href="/photoswipe/photoswipe.css">
+<link rel="stylesheet" href="/photoswipe/default-skin/default-skin.css">
+
+
+<script src="/photoswipe/photoswipe.min.js"></script>
+<script src="/photoswipe/photoswipe-ui-default.min.js"></script>
+
+
+<!-- Root element of PhotoSwipe. Must have class pswp. -->
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+    <!-- Background of PhotoSwipe. 
+         It's a separate element as animating opacity is faster than rgba(). -->
+    <div class="pswp__bg"></div>
+    <!-- Slides wrapper with overflow:hidden. -->
+    <div class="pswp__scroll-wrap">
+        <!-- Container that holds slides. 
+            PhotoSwipe keeps only 3 of them in the DOM to save memory.
+            Don't modify these 3 pswp__item elements, data is added later on. -->
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+        <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+        <div class="pswp__ui pswp__ui--hidden">
+            <div class="pswp__top-bar">
+                <!--  Controls are self-explanatory. Order can be changed. -->
+                <div class="pswp__counter"></div>
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+                <!-- Preloader demo http://codepen.io/dimsemenov/pen/yyBWoR -->
+                <!-- element will get class pswp__preloader--active when preloader is running -->
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                      <div class="pswp__preloader__cut">
+                        <div class="pswp__preloader__donut"></div>
+                      </div>
+                    </div>
+                </div>
+            </div>
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div> 
+            </div>
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+</html>
